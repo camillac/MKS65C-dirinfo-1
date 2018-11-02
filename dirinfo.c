@@ -107,8 +107,8 @@ int main(){
 
   while (info != NULL) {
     name = info->d_name;
+    stat(name, s);
     if (info->d_type == DT_DIR){
-      stat(name, s);
       strcat(dirs, "\t");
       strcat(dirs, permiss(s->st_mode));
       strcat(dirs, "  ");
@@ -119,7 +119,6 @@ int main(){
       strcat(dirs, name);
       strcat(dirs, " \n");
     }else{
-      stat(name, s);
       size += s->st_size;
       strcat(fils, "\t");
       strcat(fils, permiss(s->st_mode));
