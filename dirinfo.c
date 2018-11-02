@@ -8,6 +8,15 @@
 #include <dirent.h>
 #include <string.h>
 
+char * strrpt(char * str, int n){
+  char * rtrnStr = malloc(n * sizeof(char));
+  while(n){
+    strcat(rtrnStr, str);
+    n--;
+  }
+  return rtrnStr;
+}
+
 char * permisshelp(int x){
     char * rtrnStr = malloc(3 * sizeof(char));
 
@@ -88,8 +97,8 @@ char * grupid(long stgid){
   return getgrgid(stgid)->gr_name;
 }
 
-int main(){
-  DIR * d = opendir(".");
+char * subdir(char * dirname, int numtabs){
+  DIR * d = opendir(dirname);
   struct dirent * info = readdir(d);
 
   struct stat * s = malloc(sizeof(struct stat));
@@ -98,18 +107,20 @@ int main(){
   char * name;
   int size = 0;
 
-  char * stats = "Statistics for Directory: .\n";
+  char * stats = malloc(sizeof(char) * 64);
+  sprintf(stats, "%sStatistics for Directory: %s\n", strrpt("\t", numtabs), dirname);
 
-  char * dirs = malloc(sizeof(char) * 1024);
+  char * dirs = malloc(sizeof(char) * 256);
   strcat(dirs, "Directories: \n");
-  char * fils = malloc(sizeof(char) * 1024);
+  char * fils = malloc(sizeof(char) * 256);
   strcat(fils, "Files: \n");
+  char * subdirs = malloc(sizeof(char) * 512);
 
   while (info != NULL) {
     name = info->d_name;
     stat(name, s);
     if (info->d_type == DT_DIR){
-      strcat(dirs, "\t");
+      strcat(dirs, strrpt("\t", numtabs + 1));
       strcat(dirs, permiss(s->st_mode));
       strcat(dirs, "  ");
       strcat(dirs, userid(s->st_uid));
@@ -118,9 +129,10 @@ int main(){
       strcat(dirs, "  ");
       strcat(dirs, name);
       strcat(dirs, " \n");
+      strcat(subdirs, subdir(name, numtabs + 1));
     }else{
       size += s->st_size;
-      strcat(fils, "\t");
+      strcat(fils, strrpt("\t", numtabs + 1));
       strcat(fils, permiss(s->st_mode));
       strcat(fils, "  ");
       strcat(fils, userid(s->st_uid));
@@ -133,15 +145,28 @@ int main(){
     info = readdir(d);
   }
 
-  printf("%s", stats);
-  printf("Total Directory Size: %s\n", datasize(size));
+  char * all = malloc(2048 * sizeof(char));
 
-  printf("%s\n", dirs);
-  printf("%s\n", fils);
+  strcat(all, stats);
+  strcat(all, strrpt("\t", numtabs));
+  strcat(all, "Total Directory Size: ");
+  strcat(all, datasize(size));
+  strcat(all, "\n");
+
+  strcat(all, dirs);
+  strcat(all, fils);
+  strcat(all, subdirs);
 
   closedir(d);
   free(s);
   free(dirs);
   free(fils);
+  return all;
+}
+
+int main(){
+  char * container = subdir(".", 0);
+  printf("%s", container);
+  free(container);
   return 0;
 }
