@@ -44,9 +44,7 @@ char * permiss(int x){
 
     char * rtrnStr = malloc(9 * sizeof(char));
 
-    strcat(rtrnStr, permisshelp(usr));
-    strcat(rtrnStr, permisshelp(grp));
-    strcat(rtrnStr, permisshelp(otr));
+    sprintf(rtrnStr, "%s%s%s", permisshelp(usr), permisshelp(grp), permisshelp(otr));
 
     return rtrnStr;
 }
