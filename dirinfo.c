@@ -8,45 +8,19 @@
 #include <dirent.h>
 #include <string.h>
 
-char * permisshelp(int x){
-    char * rtrnStr = malloc(3 * sizeof(char));
-
-    if(x >= 4){
-        x -= 4;
-        strcat(rtrnStr, "r");
-    }else{
-        strcat(rtrnStr, "-");
-    }
-
-    if(x >= 2){
-        x -= 2;
-        strcat(rtrnStr, "w");
-    }else{
-        strcat(rtrnStr, "-");
-    }
-
-    if(x >= 1){
-        x -= 1;
-        strcat(rtrnStr, "x");
-    }else{
-        strcat(rtrnStr, "-");
-    }
-
-    return rtrnStr;
-}
-
 char * permiss(int x){
-    int usr = x / 64;
-    x -= usr * 64;
-    int grp = x / 8;
-    x -= grp * 8;
-    int otr = x;
-
-    char * rtrnStr = malloc(9 * sizeof(char));
-
-    sprintf(rtrnStr, "%s%s%s", permisshelp(usr), permisshelp(grp), permisshelp(otr));
-
-    return rtrnStr;
+    char * s = malloc (10 * sizeof(char));
+    strcat(s, (S_ISDIR(x)) ? "d" : "-");
+    strcat(s, (x & S_IRUSR) ? "r" : "-");
+    strcat(s, (x & S_IWUSR) ? "w" : "-");
+    strcat(s, (x & S_IXUSR) ? "x" : "-");
+    strcat(s, (x & S_IRGRP) ? "r" : "-");
+    strcat(s, (x & S_IWGRP) ? "w" : "-");
+    strcat(s, (x & S_IXGRP) ? "x" : "-");
+    strcat(s, (x & S_IROTH) ? "r" : "-");
+    strcat(s, (x & S_IWOTH) ? "w" : "-");
+    strcat(s, (x & S_IXOTH) ? "x" : "-");
+    return s;
 }
 
 char * datasize(long long int s){
